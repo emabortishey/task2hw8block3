@@ -13,39 +13,48 @@ private:
 	static int counter;
 	int length;
 	char* stringg;
+
 public:
-	stri() : stri(80, "nope") {}
-
-	stri(int length_P) : stri(length_P, "nope") {}
-
-	stri(int length_P, const char* stringg_P) : length{ length_P }, stringg{ new char[length] { *stringg_P } } { get_count()++; }
-
-	void set_string(char* stringg_P)
+	stri() : stri(80, nullptr) {}
+	stri(int length_P) : stri(length_P, nullptr) {}
+	stri(int length_P, const char* stringg_P) : length{ length_P }, stringg{ new char[length_P] }
 	{
-		strcpy_s(stringg, length, stringg_P);
+		if (stringg_P)
+		{
+			strcpy_s(stringg, length, stringg_P);
+		}
+		else
+		{
+			strcpy_s(stringg, length, "none");
+		}
+		counter_link()++; 
+	}
+	stri(const stri& obj) : length{ obj.length }, stringg{ new char[obj.length] { *obj.stringg } }
+	{
+		stringg = new char[length] { *obj.stringg };
+		counter_link()++;
 	}
 
-
-	void print_string()
+	stri(stri&& obj) : length{ obj.length }, stringg{obj.stringg}
 	{
-		cout << "\nСтрока: ";
-		puts(stringg);
+		obj.stringg = nullptr;
+		obj.length = 0;
+		counter_link()++;
 	}
 
-	char* get_string()
-	{
-		return stringg;
-	}
+	void set_string(char* stringg_P);
 
-	static int& get_count()
-	{
+	const char* get_string() { return stringg; }
 
+	void print_string() const { puts(stringg); }
+
+	static int& counter_link() {
 		static int counter = 0;
-		return counter;
-	}
+		return counter; }
 
 	~stri()
 	{
+		counter_link()--;
 		delete[] stringg;
 	}
 };
